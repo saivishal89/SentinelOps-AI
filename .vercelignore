@@ -1,0 +1,9 @@
+backend/venv
+backend/hackforge.db
+**/node_modules
+**/.pnpm-store
+.git
+.agents
+.gemini
+*.pyc
+__pycache__

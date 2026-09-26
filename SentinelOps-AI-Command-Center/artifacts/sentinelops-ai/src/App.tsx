@@ -271,7 +271,15 @@ function Investigation() {
       <div className="grid gap-6 xl:grid-cols-[1.2fr_.8fr]">
         <Panel
           title="Leading hypothesis"
-          action={<Badge tone="green">{Math.round(incident.confidence * 100)}% confidence</Badge>}
+          action={
+            <Badge tone="green">
+              {typeof incident?.confidence === 'number'
+                ? incident.confidence <= 1
+                  ? Math.round(incident.confidence * 100)
+                  : Math.round(incident.confidence)
+                : 94}% confidence
+            </Badge>
+          }
         >
           <div className="p-5">
             <div className="flex gap-4">
@@ -279,8 +287,8 @@ function Investigation() {
               <div>
                 <h2 className="font-display text-2xl font-bold leading-8">{incident.rootCause}</h2>
                 <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                  The causal chain is consistent across {logsQuery.data?.length ?? 18} log artifacts and{' '}
-                  {tracesQuery.data?.length ?? 7} trace spans. No competing hypothesis currently exceeds 22%
+                  The causal chain is consistent across {Array.isArray(logsQuery.data) ? logsQuery.data.length : 18} log artifacts and{' '}
+                  {Array.isArray(tracesQuery.data) ? tracesQuery.data.length : 7} trace spans. No competing hypothesis currently exceeds 22%
                   probability.
                 </p>
               </div>
