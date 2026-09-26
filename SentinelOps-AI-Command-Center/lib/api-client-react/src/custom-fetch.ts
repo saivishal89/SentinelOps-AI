@@ -362,6 +362,18 @@ export async function customFetch<T = unknown>(
 
   const response = await fetch(input, { ...init, method, headers });
 
+  const mediaType = getMediaType(response.headers);
+  const isHtml = mediaType === "text/html";
+  const isApiEndpoint = requestInfo.url.includes("/api/") || requestInfo.url.startsWith("/api");
+
+  if (isHtml && (isApiEndpoint || responseType === "json")) {
+    throw new ApiError(
+      response,
+      "Received HTML instead of JSON for API request (likely an SPA route rewrite fallback).",
+      requestInfo,
+    );
+  }
+
   if (!response.ok) {
     const errorData = await parseErrorBody(response, method);
     throw new ApiError(response, errorData, requestInfo);
