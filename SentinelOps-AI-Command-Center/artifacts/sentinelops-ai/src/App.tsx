@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
+import { AIIncidentChat } from '@/components/ai-chat/ai-incident-chat';
 import {
   useApproveIncident,
   useExecuteIncident,
@@ -234,7 +235,104 @@ function Investigation() {
   const investigate = useInvestigateIncident();
   const recommend = useGenerateRecommendation();
   const incident = incidentQuery.data ?? fallbackIncidents[0];
-  return <div className="mx-auto max-w-[1320px]"><PageHeader eyebrow="Evidence before action" title="Investigation" description="Watch the agents build a case. The recommendation remains inert until a human approves it." actions={<><Button onClick={() => investigate.mutate({ id: selectedId })} disabled={investigate.isPending} variant="secondary" testId="button-run-investigation"><RefreshCw className={cn('h-3.5 w-3.5', investigate.isPending && 'animate-spin')} />{investigate.isPending ? 'Investigating…' : 'Run investigation'}</Button><Button onClick={() => recommend.mutate({ id: selectedId })} disabled={recommend.isPending} testId="button-generate-recommendation"><Sparkles className="h-3.5 w-3.5" />Generate recommendation</Button></>} /><div className="grid gap-6 xl:grid-cols-[.85fr_1.15fr]"><Panel title="Agent roster"><div className="divide-y divide-border">{[['Detection agent', 'Signal triage', 'Complete', CheckCircle2], ['Investigation agent', 'Trace + log correlation', investigate.isPending ? 'Running' : 'Complete', Bot], ['Remediation agent', 'Safe action planning', 'Ready', ShieldCheck]].map(([name, role, state, Icon]) => <div key={name as string} className="flex items-center gap-3 p-4"><span className={cn('flex h-9 w-9 items-center justify-center rounded-md', state === 'Running' ? 'bg-accent/20 text-accent-foreground' : 'bg-primary/10 text-primary')}><Icon className={cn('h-4 w-4', state === 'Running' && 'animate-pulse')} /></span><div className="flex-1"><div className="text-xs font-bold">{name as string}</div><div className="mt-1 text-[11px] text-muted-foreground">{role as string}</div></div><Badge tone={state === 'Complete' ? 'green' : state === 'Running' ? 'amber' : 'blue'}>{state as string}</Badge></div>)}</div><div className="border-t border-border bg-muted/35 p-4"><div className="flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[.12em] text-muted-foreground"><LockKeyhole className="h-3.5 w-3.5" />Action boundary</div><p className="mt-2 text-xs leading-5 text-muted-foreground">Agents can inspect and simulate. Production changes require an explicit approval event from an operator.</p></div></Panel><div className="space-y-6"><Panel title="Leading hypothesis" action={<Badge tone="green">{Math.round(incident.confidence * 100)}% confidence</Badge>}><div className="p-5"><div className="flex gap-4"><div className="mt-1 h-8 w-1 rounded-full bg-primary" /><div><h2 className="font-display text-2xl font-bold leading-8">{incident.rootCause}</h2><p className="mt-3 text-sm leading-6 text-muted-foreground">The causal chain is consistent across {logsQuery.data?.length ?? 18} log artifacts and {tracesQuery.data?.length ?? 7} trace spans. No competing hypothesis currently exceeds 22% probability.</p></div></div><div className="mt-6 grid gap-3 sm:grid-cols-3"><div className="rounded-md border border-border p-3"><div className="font-mono text-[10px] text-muted-foreground">SUPPORTING</div><div className="mt-1 font-display text-lg font-bold">18 logs</div></div><div className="rounded-md border border-border p-3"><div className="font-mono text-[10px] text-muted-foreground">CORRELATED</div><div className="mt-1 font-display text-lg font-bold">7 spans</div></div><div className="rounded-md border border-border p-3"><div className="font-mono text-[10px] text-muted-foreground">CONFLICTING</div><div className="mt-1 font-display text-lg font-bold">0 signals</div></div></div></div></Panel><Panel title="Hypothesis ledger"><div className="divide-y divide-border">{[['Connection pool regression', 94, 'Strong support'], ['Redis node saturation', 22, 'Weak support'], ['Regional network degradation', 8, 'Contradicted']].map(([hypothesis, confidence, note]) => <div key={hypothesis as string} className="flex items-center gap-4 p-4"><div className="flex-1"><div className="text-xs font-bold">{hypothesis as string}</div><div className="mt-1 text-[11px] text-muted-foreground">{note as string}</div></div><div className="w-24"><div className="mb-1 text-right font-mono text-[10px]">{confidence}%</div><div className="h-1.5 rounded-full bg-muted"><div className={cn('h-full rounded-full', Number(confidence) > 70 ? 'bg-primary' : 'bg-muted-foreground/40')} style={{ width: `${confidence}%` }} /></div></div></div>)}</div></Panel></div></div></div>;
+  return (
+    <div className="mx-auto max-w-[1400px] space-y-7">
+      <PageHeader
+        eyebrow="Evidence before action"
+        title="AI Incident Investigation Swarm"
+        description="Collaborative 7-agent investigation rail with autonomous handoffs, live telemetry, and human-in-the-loop remediation control."
+        actions={
+          <>
+            <Button
+              onClick={() => investigate.mutate({ id: selectedId })}
+              disabled={investigate.isPending}
+              variant="secondary"
+              testId="button-run-investigation"
+            >
+              <RefreshCw className={cn('h-3.5 w-3.5', investigate.isPending && 'animate-spin')} />
+              {investigate.isPending ? 'Investigating…' : 'Run investigation'}
+            </Button>
+            <Button
+              onClick={() => recommend.mutate({ id: selectedId })}
+              disabled={recommend.isPending}
+              testId="button-generate-recommendation"
+            >
+              <Sparkles className="h-3.5 w-3.5" />
+              Generate recommendation
+            </Button>
+          </>
+        }
+      />
+
+      {/* AI Chat 6 Multi-Agent Swarm Component */}
+      <AIIncidentChat incidentId={selectedId} />
+
+      {/* Evidence & Leading Hypothesis */}
+      <div className="grid gap-6 xl:grid-cols-[1.2fr_.8fr]">
+        <Panel
+          title="Leading hypothesis"
+          action={<Badge tone="green">{Math.round(incident.confidence * 100)}% confidence</Badge>}
+        >
+          <div className="p-5">
+            <div className="flex gap-4">
+              <div className="mt-1 h-8 w-1 rounded-full bg-primary" />
+              <div>
+                <h2 className="font-display text-2xl font-bold leading-8">{incident.rootCause}</h2>
+                <p className="mt-3 text-sm leading-6 text-muted-foreground">
+                  The causal chain is consistent across {logsQuery.data?.length ?? 18} log artifacts and{' '}
+                  {tracesQuery.data?.length ?? 7} trace spans. No competing hypothesis currently exceeds 22%
+                  probability.
+                </p>
+              </div>
+            </div>
+            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              <div className="rounded-md border border-border p-3">
+                <div className="font-mono text-[10px] text-muted-foreground">SUPPORTING</div>
+                <div className="mt-1 font-display text-lg font-bold">18 logs</div>
+              </div>
+              <div className="rounded-md border border-border p-3">
+                <div className="font-mono text-[10px] text-muted-foreground">CORRELATED</div>
+                <div className="mt-1 font-display text-lg font-bold">7 spans</div>
+              </div>
+              <div className="rounded-md border border-border p-3">
+                <div className="font-mono text-[10px] text-muted-foreground">CONFLICTING</div>
+                <div className="mt-1 font-display text-lg font-bold">0 signals</div>
+              </div>
+            </div>
+          </div>
+        </Panel>
+
+        <Panel title="Hypothesis ledger">
+          <div className="divide-y divide-border">
+            {[
+              ['Connection pool regression', 94, 'Strong support'],
+              ['Redis node saturation', 22, 'Weak support'],
+              ['Regional network degradation', 8, 'Contradicted'],
+            ].map(([hypothesis, confidence, note]) => (
+              <div key={hypothesis as string} className="flex items-center gap-4 p-4">
+                <div className="flex-1">
+                  <div className="text-xs font-bold">{hypothesis as string}</div>
+                  <div className="mt-1 text-[11px] text-muted-foreground">{note as string}</div>
+                </div>
+                <div className="w-24">
+                  <div className="mb-1 text-right font-mono text-[10px]">{confidence}%</div>
+                  <div className="h-1.5 rounded-full bg-muted">
+                    <div
+                      className={cn(
+                        'h-full rounded-full',
+                        Number(confidence) > 70 ? 'bg-primary' : 'bg-muted-foreground/40'
+                      )}
+                      style={{ width: `${confidence}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Panel>
+      </div>
+    </div>
+  );
 }
 
 function ServiceMap() {
