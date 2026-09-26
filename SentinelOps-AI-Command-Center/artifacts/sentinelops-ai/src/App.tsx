@@ -87,46 +87,46 @@ function Button({ children, onClick, href, variant = 'primary', disabled = false
   disabled?: boolean; className?: string; testId?: string;
 }) {
   const styles = {
-    primary: 'bg-primary text-primary-foreground hover:brightness-105',
-    secondary: 'bg-secondary text-secondary-foreground border border-border hover:bg-muted',
-    ghost: 'bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground',
-    danger: 'bg-destructive text-destructive-foreground hover:brightness-105',
-    amber: 'bg-accent text-accent-foreground hover:brightness-105',
+    primary: 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white shadow-[0_0_20px_rgba(6,182,212,0.3)] hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] hover:brightness-110 active:scale-95',
+    secondary: 'bg-slate-800/80 text-slate-200 border border-slate-700/80 hover:border-cyan-500/40 hover:bg-slate-700/80 hover:text-white shadow-sm active:scale-95',
+    ghost: 'bg-transparent text-slate-400 hover:bg-slate-800/50 hover:text-white',
+    danger: 'bg-gradient-to-r from-rose-600 to-red-600 text-white shadow-[0_0_20px_rgba(244,63,94,0.3)] hover:brightness-110 active:scale-95',
+    amber: 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:brightness-110 active:scale-95',
   };
-  const body = <span className={cn('inline-flex items-center justify-center gap-2 rounded-md px-3.5 py-2 text-[12px] font-bold tracking-[-.01em] transition-all active:scale-[.98] disabled:opacity-50', styles[variant], className)}>{children}</span>;
+  const body = <span className={cn('inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-[12px] font-bold tracking-[-.01em] transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed', styles[variant], className)}>{children}</span>;
   if (href) return <Link href={href} data-testid={testId} className="inline-flex">{body}</Link>;
   return <button type="button" onClick={onClick} disabled={disabled} data-testid={testId} className={cn('cursor-pointer', disabled && 'cursor-not-allowed')}>{body}</button>;
 }
 
 function Badge({ children, tone = 'neutral', testId = 'status-badge' }: { children: React.ReactNode; tone?: 'neutral' | 'green' | 'amber' | 'red' | 'blue'; testId?: string }) {
   const styles = {
-    neutral: 'bg-muted text-muted-foreground border-border',
-    green: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-    amber: 'bg-amber-50 text-amber-700 border-amber-200',
-    red: 'bg-red-50 text-red-700 border-red-200',
-    blue: 'bg-sky-50 text-sky-700 border-sky-200',
+    neutral: 'bg-slate-800 text-slate-300 border-slate-700',
+    green: 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.15)]',
+    amber: 'bg-amber-500/15 text-amber-300 border-amber-500/30 shadow-[0_0_10px_rgba(245,158,11,0.15)]',
+    red: 'bg-rose-500/15 text-rose-300 border-rose-500/30 shadow-[0_0_10px_rgba(244,63,94,0.15)]',
+    blue: 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30 shadow-[0_0_10px_rgba(6,182,212,0.15)]',
   };
-  return <span data-testid={testId} className={cn('inline-flex items-center gap-1.5 rounded border px-2 py-1 text-[10px] font-extrabold uppercase tracking-[.12em]', styles[tone])}>{children}</span>;
+  return <span data-testid={testId} className={cn('inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-[.12em] backdrop-blur-sm', styles[tone])}>{children}</span>;
 }
 
 function Panel({ children, className = '', title, action }: { children: React.ReactNode; className?: string; title?: string; action?: React.ReactNode }) {
-  return <section className={cn('panel-shadow rounded-lg border border-border bg-card', className)}>
-    {(title || action) && <div className="flex items-center justify-between border-b border-border px-5 py-4"><h2 className="text-[12px] font-extrabold uppercase tracking-[.13em] text-muted-foreground">{title}</h2>{action}</div>}
+  return <section className={cn('rounded-xl border border-slate-700/70 bg-[#0e1627]/90 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.4)]', className)}>
+    {(title || action) && <div className="flex items-center justify-between border-b border-slate-700/60 px-5 py-4"><h2 className="text-[12px] font-extrabold uppercase tracking-[.13em] text-cyan-400 flex items-center gap-2">{title}</h2>{action}</div>}
     {children}
   </section>;
 }
 
 function Metric({ label, value, detail, icon: Icon, tone = 'default' }: { label: string; value: string; detail: string; icon: React.ElementType; tone?: 'default' | 'warn' | 'good' }) {
-  return <div data-testid={`metric-${label.toLowerCase().replaceAll(' ', '-')}`} className="rounded-lg border border-border bg-card p-4 panel-shadow">
-    <div className="flex items-start justify-between"><span className="text-[10px] font-extrabold uppercase tracking-[.13em] text-muted-foreground">{label}</span><Icon className={cn('h-4 w-4', tone === 'warn' ? 'text-accent' : tone === 'good' ? 'text-primary' : 'text-muted-foreground')} /></div>
-    <div className="mt-3 font-display text-2xl font-bold tracking-tight text-foreground">{value}</div>
-    <div className={cn('mt-1 text-[11px]', tone === 'warn' ? 'text-amber-700' : 'text-muted-foreground')}>{detail}</div>
+  return <div data-testid={`metric-${label.toLowerCase().replaceAll(' ', '-')}`} className="rounded-xl border border-slate-700/60 bg-[#0c1424]/90 p-4 shadow-md backdrop-blur-md hover:border-cyan-500/40 transition-colors">
+    <div className="flex items-start justify-between"><span className="text-[10px] font-extrabold uppercase tracking-[.13em] text-slate-400">{label}</span><Icon className={cn('h-4 w-4', tone === 'warn' ? 'text-amber-400' : tone === 'good' ? 'text-emerald-400' : 'text-cyan-400')} /></div>
+    <div className="mt-3 font-display text-2xl font-bold tracking-tight text-white">{value}</div>
+    <div className={cn('mt-1 text-[11px] font-medium', tone === 'warn' ? 'text-amber-300' : 'text-slate-400')}>{detail}</div>
   </div>;
 }
 
 function PageHeader({ eyebrow, title, description, actions }: { eyebrow: string; title: string; description: string; actions?: React.ReactNode }) {
   return <header className="mb-7 flex flex-col justify-between gap-4 md:flex-row md:items-end">
-    <div><div className="mb-2 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[.18em] text-primary"><CircleDot className="h-3 w-3 animate-pulse-soft" />{eyebrow}</div><h1 data-testid={`heading-${title.toLowerCase().replaceAll(' ', '-')}`} className="font-display text-3xl font-bold tracking-[-.035em] text-foreground md:text-[36px]">{title}</h1><p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{description}</p></div>
+    <div><div className="mb-2 flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[.18em] text-cyan-400"><CircleDot className="h-3 w-3 text-cyan-400 animate-ping" />{eyebrow}</div><h1 data-testid={`heading-${title.toLowerCase().replaceAll(' ', '-')}`} className="font-display text-3xl font-extrabold tracking-[-.035em] text-white md:text-[36px] drop-shadow-sm">{title}</h1><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-300">{description}</p></div>
     {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
   </header>;
 }
@@ -340,11 +340,11 @@ function ServiceMap() {
   const incidentQuery = useGetIncidents();
   const incidents = incidentQuery.data ?? fallbackIncidents;
   const services = ['edge-router', 'checkout-api', 'payments-worker', 'redis-primary', 'ledger-db', 'notifications'];
-  return <div className="mx-auto max-w-[1320px]"><PageHeader eyebrow="Dependency health" title="Service map" description="Understand the blast radius at a glance. Node status reflects current production telemetry." actions={<Button variant="secondary" onClick={() => summaryQuery.refetch()}><RefreshCw className="h-3.5 w-3.5" />Refresh map</Button>} /><div className="grid gap-6 xl:grid-cols-[1.45fr_.55fr]"><Panel title="Production topology" action={<div className="flex gap-3 text-[10px] text-muted-foreground"><span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-primary" />Healthy</span><span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-accent" />Watch</span><span className="flex items-center gap-1"><span className="h-2 w-2 rounded-full bg-destructive" />Degraded</span></div>}><div className="relative min-h-[490px] overflow-hidden bg-[hsl(216_33%_97%)] p-6"><div className="absolute left-[18%] right-[18%] top-[50%] h-px bg-border" /><div className="absolute bottom-[22%] left-[30%] top-[24%] w-px bg-border" /><div className="absolute bottom-[22%] right-[30%] top-[24%] w-px bg-border" /><div className="relative grid h-full grid-cols-3 gap-5"><ServiceNode name="edge-router" status="healthy" icon={Cloud} position="col-start-2" /><ServiceNode name="checkout-api" status="degraded" icon={Code2} position="col-start-1 row-start-2" detail="p95 842ms" /><ServiceNode name="payments-worker" status="watch" icon={Zap} position="col-start-2 row-start-2" detail="queue depth 74%" /><ServiceNode name="notifications" status="healthy" icon={Activity} position="col-start-3 row-start-2" /><ServiceNode name="redis-primary" status="watch" icon={Database} position="col-start-1 row-start-3" detail="pool 68%" /><ServiceNode name="ledger-db" status="healthy" icon={Server} position="col-start-3 row-start-3" /></div></div></Panel><Panel title="Blast radius"><div className="p-5"><div className="flex items-end gap-3"><div className="font-display text-5xl font-bold">{incidents[0]?.affectedServices.length ?? 3}</div><div className="pb-1 text-xs text-muted-foreground">services in active path</div></div><div className="mt-6 space-y-4">{incidents[0]?.affectedServices.map((service) => <div key={service} className="flex items-center gap-3"><span className="h-2 w-2 rounded-full bg-destructive" /><div className="flex-1 text-xs font-bold">{service}</div><span className="font-mono text-[10px] text-destructive">degraded</span></div>)}</div><div className="mt-8 rounded-md border border-accent/30 bg-accent/10 p-3 text-xs leading-5"><AlertTriangle className="mr-1 inline h-3.5 w-3.5 text-accent-foreground" />Changes to <strong>checkout-api</strong> may cascade to payment authorization.</div></div></Panel></div></div>;
+  return <div className="mx-auto max-w-[1320px]"><PageHeader eyebrow="Dependency health" title="Service map" description="Understand the blast radius at a glance. Node status reflects current production telemetry." actions={<Button variant="secondary" onClick={() => summaryQuery.refetch()}><RefreshCw className="h-3.5 w-3.5" />Refresh map</Button>} /><div className="grid gap-6 xl:grid-cols-[1.45fr_.55fr]"><Panel title="Production topology" action={<div className="flex gap-3 text-[10px] text-muted-foreground"><span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-emerald-400" />Healthy</span><span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />Watch</span><span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full bg-rose-400 animate-ping" />Degraded</span></div>}><div className="relative min-h-[490px] overflow-hidden rounded-xl border border-cyan-500/25 bg-[#050a14] p-6 shadow-inner"><div className="absolute left-[18%] right-[18%] top-[50%] h-px bg-cyan-500/20" /><div className="absolute bottom-[22%] left-[30%] top-[24%] w-px bg-cyan-500/20" /><div className="absolute bottom-[22%] right-[30%] top-[24%] w-px bg-cyan-500/20" /><div className="relative grid h-full grid-cols-3 gap-5"><ServiceNode name="edge-router" status="healthy" icon={Cloud} position="col-start-2" /><ServiceNode name="checkout-api" status="degraded" icon={Code2} position="col-start-1 row-start-2" detail="p95 842ms" /><ServiceNode name="payments-worker" status="watch" icon={Zap} position="col-start-2 row-start-2" detail="queue depth 74%" /><ServiceNode name="notifications" status="healthy" icon={Activity} position="col-start-3 row-start-2" /><ServiceNode name="redis-primary" status="watch" icon={Database} position="col-start-1 row-start-3" detail="pool 68%" /><ServiceNode name="ledger-db" status="healthy" icon={Server} position="col-start-3 row-start-3" /></div></div></Panel><Panel title="Blast radius"><div className="p-5"><div className="flex items-end gap-3"><div className="font-display text-5xl font-extrabold text-rose-400 drop-shadow-[0_0_12px_rgba(244,63,94,0.4)]">{incidents[0]?.affectedServices.length ?? 3}</div><div className="pb-1 text-xs text-slate-400">services in active blast radius</div></div><div className="mt-6 space-y-3">{incidents[0]?.affectedServices.map((service) => <div key={service} className="flex items-center gap-3 rounded-lg border border-rose-500/30 bg-rose-500/10 p-2.5"><span className="h-2 w-2 rounded-full bg-rose-400 animate-ping" /><div className="flex-1 text-xs font-bold text-white">{service}</div><span className="font-mono text-[10px] font-bold text-rose-300">degraded</span></div>)}</div><div className="mt-8 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs leading-5 text-amber-200"><AlertTriangle className="mr-1.5 inline h-3.5 w-3.5 text-amber-400" />Changes to <strong>checkout-api</strong> may cascade to payment authorization.</div></div></Panel></div></div>;
 }
 
 function ServiceNode({ name, status, icon: Icon, position, detail }: { name: string; status: string; icon: React.ElementType; position: string; detail?: string }) {
-  return <div className={cn('z-10 self-center rounded-lg border bg-card p-3 panel-shadow', position, status === 'degraded' ? 'border-destructive/45' : status === 'watch' ? 'border-accent/50' : 'border-border')}><div className="flex items-center gap-2"><span className={cn('flex h-7 w-7 items-center justify-center rounded-md', status === 'degraded' ? 'bg-red-50 text-destructive' : status === 'watch' ? 'bg-amber-50 text-accent-foreground' : 'bg-primary/10 text-primary')}><Icon className="h-3.5 w-3.5" /></span><div className="min-w-0"><div className="truncate text-[11px] font-bold">{name}</div><div className="mt-1 flex items-center gap-1 text-[9px] uppercase tracking-wider text-muted-foreground"><span className={cn('h-1.5 w-1.5 rounded-full', status === 'degraded' ? 'bg-destructive' : status === 'watch' ? 'bg-accent' : 'bg-primary')} />{detail ?? status}</div></div></div></div>;
+  return <div className={cn('z-10 self-center rounded-xl border bg-[#0d162a]/95 p-3.5 shadow-lg backdrop-blur-md transition-all hover:scale-105', position, status === 'degraded' ? 'border-rose-500/60 shadow-[0_0_15px_rgba(244,63,94,0.3)]' : status === 'watch' ? 'border-amber-500/60 shadow-[0_0_15px_rgba(245,158,11,0.3)]' : 'border-emerald-500/40 shadow-[0_0_15px_rgba(16,185,129,0.15)]')}><div className="flex items-center gap-2.5"><span className={cn('flex h-8 w-8 items-center justify-center rounded-lg', status === 'degraded' ? 'bg-rose-500/20 text-rose-400' : status === 'watch' ? 'bg-amber-500/20 text-amber-400' : 'bg-emerald-500/20 text-emerald-400')}><Icon className="h-4 w-4" /></span><div className="min-w-0"><div className="truncate text-xs font-bold text-white">{name}</div><div className="mt-0.5 flex items-center gap-1.5 text-[9px] uppercase tracking-wider text-slate-400"><span className={cn('h-1.5 w-1.5 rounded-full', status === 'degraded' ? 'bg-rose-400 animate-ping' : status === 'watch' ? 'bg-amber-400 animate-pulse' : 'bg-emerald-400')} />{detail ?? status}</div></div></div></div>;
 }
 
 function Timeline() {
