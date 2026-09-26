@@ -1,0 +1,9 @@
+{
+  "name": "hackforge-sentinelops",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "cd SentinelOps-AI-Command-Center && pnpm install --ignore-scripts && pnpm --filter @workspace/sentinelops-ai run build",
+    "dev": "cd SentinelOps-AI-Command-Center && pnpm --filter @workspace/sentinelops-ai run dev"
+  }
+}

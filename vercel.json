@@ -1,0 +1,12 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "cd SentinelOps-AI-Command-Center && pnpm install --ignore-scripts && pnpm --filter @workspace/sentinelops-ai run build",
+  "outputDirectory": "SentinelOps-AI-Command-Center/artifacts/sentinelops-ai/dist/public",
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
