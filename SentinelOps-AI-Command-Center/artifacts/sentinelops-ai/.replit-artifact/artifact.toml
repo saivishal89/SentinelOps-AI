@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "SentinelOps AI"
+description = "A polished incident command center for AI-assisted diagnosis, human-approved remediation, sandbox execution, verification, rollback, and auditability."
+version = "1.0.0"
+id = "artifacts/sentinelops-ai"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18877
+
+[services.development]
+run = "pnpm --filter @workspace/sentinelops-ai run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/sentinelops-ai", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/sentinelops-ai/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18877"
+BASE_PATH = "/"

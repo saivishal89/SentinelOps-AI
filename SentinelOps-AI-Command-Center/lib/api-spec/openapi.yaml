@@ -1,0 +1,417 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: incidents
+    description: Incident lifecycle operations
+  - name: audit
+    description: Audit and action history
+  - name: evaluations
+    description: Agent evaluation operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [incidents]
+      summary: Get command center summary
+      responses:
+        "200":
+          description: Current operational summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+  /incidents:
+    get:
+      operationId: getIncidents
+      tags: [incidents]
+      summary: List incidents
+      responses:
+        "200":
+          description: Incidents
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Incident"
+  /incidents/{id}:
+    get:
+      operationId: getIncident
+      tags: [incidents]
+      summary: Get incident details
+      parameters:
+        - $ref: "#/components/parameters/IncidentId"
+      responses:
+        "200":
+          description: Incident details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Incident"
+        "404":
+          description: Incident not found
+  /incidents/{id}/logs:
+    get:
+      operationId: getIncidentLogs
+      tags: [incidents]
+      summary: Get collected logs
+      parameters:
+        - $ref: "#/components/parameters/IncidentId"
+      responses:
+        "200":
+          description: Incident logs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LogEntry"
+  /incidents/{id}/metrics:
+    get:
+      operationId: getIncidentMetrics
+      tags: [incidents]
+      summary: Get incident metrics
+      parameters:
+        - $ref: "#/components/parameters/IncidentId"
+      responses:
+        "200":
+          description: Incident metrics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IncidentMetrics"
+  /incidents/{id}/traces:
+    get:
+      operationId: getIncidentTraces
+      tags: [incidents]
+      summary: Get incident traces
+      parameters:
+        - $ref: "#/components/parameters/IncidentId"
+      responses:
+        "200":
+          description: Incident traces
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TraceSpan"
+  /incidents/{id}/timeline:
+    get:
+      operationId: getIncidentTimeline
+      tags: [incidents]
+      summary: Get incident timeline
+      parameters:
+        - $ref: "#/components/parameters/IncidentId"
+      responses:
+        "200":
+          description: Incident timeline
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TimelineEvent"
+  /incidents/{id}/investigate:
+    post:
+      operationId: investigateIncident
+      tags: [incidents]
+      summary: Start AI investigation
+      parameters:
+        - $ref: "#/components/parameters/IncidentId"
+      responses:
+        "200":
+          description: Investigation started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Incident"
+  /incidents/{id}/recommendation:
+    post:
+      operationId: generateRecommendation
+      tags: [incidents]
+      summary: Generate remediation recommendation
+      parameters:
+        - $ref: "#/components/parameters/IncidentId"
+      responses:
+        "200":
+          description: Recommendation generated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Incident"
+  /incidents/{id}/approve:
+    post:
+      operationId: approveIncident
+      tags: [incidents]
+      summary: Approve recommended action
+      parameters:
+        - $ref: "#/components/parameters/IncidentId"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IncidentActionInput"
+      responses:
+        "200":
+          description: Approval recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Incident"
+  /incidents/{id}/reject:
+    post:
+      operationId: rejectIncident
+      tags: [incidents]
+      summary: Reject recommended action
+      parameters:
+        - $ref: "#/components/parameters/IncidentId"
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IncidentActionInput"
+      responses:
+        "200":
+          description: Rejection recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Incident"
+  /incidents/{id}/execute:
+    post:
+      operationId: executeIncident
+      tags: [incidents]
+      summary: Execute the safe sandbox action
+      parameters:
+        - $ref: "#/components/parameters/IncidentId"
+      responses:
+        "200":
+          description: Execution started or completed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Incident"
+  /incidents/{id}/rollback:
+    post:
+      operationId: rollbackIncident
+      tags: [incidents]
+      summary: Execute recovery rollback
+      parameters:
+        - $ref: "#/components/parameters/IncidentId"
+      responses:
+        "200":
+          description: Rollback started or completed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Incident"
+  /incidents/{id}/verify:
+    post:
+      operationId: verifyIncident
+      tags: [incidents]
+      summary: Verify incident health
+      parameters:
+        - $ref: "#/components/parameters/IncidentId"
+      responses:
+        "200":
+          description: Verification result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Incident"
+  /audit:
+    get:
+      operationId: getAudit
+      tags: [audit]
+      summary: List audit events
+      responses:
+        "200":
+          description: Audit events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AuditEvent"
+  /evaluations:
+    get:
+      operationId: getEvaluations
+      tags: [evaluations]
+      summary: Get evaluation metrics and scenarios
+      responses:
+        "200":
+          description: Evaluation results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EvaluationResults"
+  /evaluations/run:
+    post:
+      operationId: runEvaluations
+      tags: [evaluations]
+      summary: Run evaluation scenarios
+      responses:
+        "200":
+          description: Evaluation run completed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EvaluationResults"
+components:
+  parameters:
+    IncidentId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    DashboardSummary:
+      type: object
+      required: [systemHealth, activeIncidents, servicesHealthy, servicesTotal, aiConfidence, errorRate, recoveryTime]
+      properties:
+        systemHealth: { type: number }
+        activeIncidents: { type: integer }
+        servicesHealthy: { type: integer }
+        servicesTotal: { type: integer }
+        aiConfidence: { type: integer }
+        errorRate: { type: number }
+        recoveryTime: { type: integer }
+    Incident:
+      type: object
+      required: [id, title, severity, status, workflowState, affectedServices, rootCause, recommendation, risk, confidence, reversible, rollbackAvailable, createdAt, updatedAt]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        severity: { type: string }
+        status: { type: string }
+        workflowState: { type: string }
+        affectedServices:
+          type: array
+          items: { type: string }
+        rootCause: { type: string }
+        recommendation: { type: string }
+        risk: { type: string }
+        confidence: { type: integer }
+        reversible: { type: boolean }
+        rollbackAvailable: { type: boolean }
+        approvedBy: { type: ["string", "null"] }
+        outcome: { type: ["string", "null"] }
+        createdAt: { type: string }
+        updatedAt: { type: string }
+    IncidentActionInput:
+      type: object
+      properties:
+        actor: { type: string }
+        note: { type: string }
+    LogEntry:
+      type: object
+      required: [timestamp, service, level, message]
+      properties:
+        timestamp: { type: string }
+        service: { type: string }
+        level: { type: string }
+        message: { type: string }
+    IncidentMetrics:
+      type: object
+      required: [cpu, memory, latency, errorRate, connections]
+      properties:
+        cpu: { type: number }
+        memory: { type: number }
+        latency: { type: number }
+        errorRate: { type: number }
+        connections: { type: number }
+    TraceSpan:
+      type: object
+      required: [service, dependency, latency, status]
+      properties:
+        service: { type: string }
+        dependency: { type: string }
+        latency: { type: number }
+        status: { type: string }
+    TimelineEvent:
+      type: object
+      required: [timestamp, type, description, service, status]
+      properties:
+        timestamp: { type: string }
+        type: { type: string }
+        description: { type: string }
+        service: { type: string }
+        status: { type: string }
+    AuditEvent:
+      type: object
+      required: [id, timestamp, actor, action, target, result, risk, incidentId]
+      properties:
+        id: { type: string }
+        timestamp: { type: string }
+        actor: { type: string }
+        action: { type: string }
+        target: { type: string }
+        result: { type: string }
+        risk: { type: string }
+        incidentId: { type: string }
+    EvaluationScenario:
+      type: object
+      required: [id, name, groundTruth, agentRootCause, baselineRootCause, agentConfidence, diagnosisSeconds, remediationSuccess]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        groundTruth: { type: string }
+        agentRootCause: { type: string }
+        baselineRootCause: { type: string }
+        agentConfidence: { type: integer }
+        diagnosisSeconds: { type: integer }
+        remediationSuccess: { type: boolean }
+    EvaluationResults:
+      type: object
+      required: [scenarios, agent, baseline]
+      properties:
+        scenarios:
+          type: array
+          items: { $ref: "#/components/schemas/EvaluationScenario" }
+        agent:
+          $ref: "#/components/schemas/EvaluationMetrics"
+        baseline:
+          $ref: "#/components/schemas/EvaluationMetrics"
+    EvaluationMetrics:
+      type: object
+      required: [rootCauseAccuracy, timeToDiagnosis, remediationSuccessRate, falsePositiveRate, confidenceCalibration]
+      properties:
+        rootCauseAccuracy: { type: number }
+        timeToDiagnosis: { type: number }
+        remediationSuccessRate: { type: number }
+        falsePositiveRate: { type: number }
+        confidenceCalibration: { type: number }
+
